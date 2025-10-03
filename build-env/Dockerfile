@@ -1,0 +1,78 @@
+FROM ubuntu:25.10
+
+# Ensure all packages are updated to the latest security patches
+RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-recommends\
+  bash \
+  black \
+  build-essential \
+  clang \
+  clang-format \
+  clang-tidy \
+  clang-tools \
+  cmake \
+  curl \
+  flake8 \
+  gcc \
+  gdb \
+  git \
+  imagemagick \
+  jq \
+  libgtest-dev \
+  libssl-dev \
+  lldb \
+  lsof \
+  man \
+  moreutils \
+  net-tools \
+  pkg-config \
+  procps \
+  python3 \
+  python3-pip \
+  sudo \
+  vim \
+  wget
+
+
+# Install Rust
+ENV RUST_VERSION=1.90.0
+ENV RUSTUP_HOME=/opt/rustup
+ENV CARGO_HOME=/opt/cargo
+RUN curl --fail https://sh.rustup.rs -sSf \
+  | sh -s -- -y --default-toolchain=${RUST_VERSION} -t x86_64-unknown-linux-musl
+ENV PATH=${CARGO_HOME}/bin:${PATH}
+
+# Add missing components for rust
+RUN rustup component add rustfmt clippy
+
+# Install python sql web browser
+# https://github.com/coleifer/sqlite-web/tree/master
+RUN pip install sqlite-web --break-system-packages
+
+# Install github cli
+RUN \
+  out=$(mktemp) \
+  && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+  && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+  && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+  && apt update \
+  && apt install gh -y
+
+
+# Add scripts
+ENV PECUNIA_SCRIPT_DIR=/opt/pecunia/scripts
+
+ADD ./build-env/scripts ${PECUNIA_SCRIPT_DIR}
+ADD ./build-env/.githooks /.githooks
+
+
+ENV PECUNIA_SRC="/workspace"
+
+RUN cp ${PECUNIA_SCRIPT_DIR}/pecunia.sh /usr/local/bin/pecunia
+RUN cp ${PECUNIA_SCRIPT_DIR}/pecunia-web.sh /usr/local/bin/pecunia-web
+
+RUN chmod +x /usr/local/bin/pecunia*
+
+# Final cleanup
+RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/log/* /usr/share/local/*
+RUN userdel -fr ubuntu || true

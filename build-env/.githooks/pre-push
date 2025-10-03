@@ -1,0 +1,11 @@
+#!/bin/sh
+
+echo "Checking the code style & lint before push ..."
+
+# Format code
+cargo fmt --all -- --check || exit 1
+
+# Lint the code
+cargo clippy --locked --all-targets --all-features -- -D warnings -D clippy::all -D clippy::mem_forget || exit 1
+
+exit 0
