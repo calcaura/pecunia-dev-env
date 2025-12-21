@@ -24,6 +24,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
   man \
   moreutils \
   net-tools \
+  openssh-client \
   pkg-config \
   procps \
   python3 \
@@ -72,6 +73,14 @@ RUN cp ${PECUNIA_SCRIPT_DIR}/pecunia.sh /usr/local/bin/pecunia
 RUN cp ${PECUNIA_SCRIPT_DIR}/pecunia-web.sh /usr/local/bin/pecunia-web
 
 RUN chmod +x /usr/local/bin/pecunia*
+
+
+RUN useradd -m -s /bin/bash cylon &&\
+    usermod -aG sudo cylon &&\
+    passwd -d cylon &&\
+    echo "cylon ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/cylon
+
+RUN chown -R cylon $CARGO_HOME
 
 # Final cleanup
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/log/* /usr/share/local/*
