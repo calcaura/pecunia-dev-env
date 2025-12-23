@@ -80,7 +80,7 @@ RUN useradd -m -s /bin/bash cylon &&\
     passwd -d cylon &&\
     echo "cylon ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/cylon
 
-RUN chown -R cylon $CARGO_HOME
+RUN sudo chmod -R 0777 /opt/
 
 # Final cleanup
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/log/* /usr/share/local/*
