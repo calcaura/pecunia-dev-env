@@ -35,7 +35,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
 
 
 # Install Rust
-ENV RUST_VERSION=1.90.0
+ENV RUST_VERSION=1.92.0
 ENV RUSTUP_HOME=/opt/rustup
 ENV CARGO_HOME=/opt/cargo
 RUN curl --fail https://sh.rustup.rs -sSf \
@@ -80,8 +80,9 @@ RUN useradd -m -s /bin/bash cylon &&\
     passwd -d cylon &&\
     echo "cylon ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/cylon
 
-RUN sudo chmod -R 0777 /opt/
-
 # Final cleanup
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/log/* /usr/share/local/*
 RUN userdel -fr ubuntu || true
+
+# Final permission fix
+RUN sudo chmod -R 0777 /opt/
