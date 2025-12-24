@@ -18,8 +18,10 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
   git \
   imagemagick \
   jq \
+  libc6-dev-arm64-cross \
   libgtest-dev \
   libssl-dev \
+  linux-libc-dev-arm64-cross \
   lldb \
   lsof \
   man \
