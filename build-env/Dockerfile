@@ -13,6 +13,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
   curl \
   flake8 \
   gcc \
+  gcc-aarch64-linux-gnu \
   gdb \
   git \
   imagemagick \
@@ -39,7 +40,7 @@ ENV RUST_VERSION=1.92.0
 ENV RUSTUP_HOME=/opt/rustup
 ENV CARGO_HOME=/opt/cargo
 RUN curl --fail https://sh.rustup.rs -sSf \
-  | sh -s -- -y --default-toolchain=${RUST_VERSION} -t x86_64-unknown-linux-musl
+  | sh -s -- -y --default-toolchain=${RUST_VERSION} -t x86_64-unknown-linux-musl -t aarch64-unknown-linux-gnu
 ENV PATH=${CARGO_HOME}/bin:${PATH}
 
 # Add missing components for rust
@@ -48,16 +49,6 @@ RUN rustup component add rustfmt clippy
 # Install python sql web browser
 # https://github.com/coleifer/sqlite-web/tree/master
 RUN pip install sqlite-web --break-system-packages
-
-# Install github cli
-RUN \
-  out=$(mktemp) \
-  && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-  && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-  && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-  && apt update \
-  && apt install gh -y
 
 
 # Add scripts
@@ -76,9 +67,9 @@ RUN chmod +x /usr/local/bin/pecunia*
 
 
 RUN useradd -m -s /bin/bash cylon &&\
-    usermod -aG sudo cylon &&\
-    passwd -d cylon &&\
-    echo "cylon ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/cylon
+  usermod -aG sudo cylon &&\
+  passwd -d cylon &&\
+  echo "cylon ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/cylon
 
 # Final cleanup
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/log/* /usr/share/local/*
