@@ -27,6 +27,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
   lsof \
   man \
   moreutils \
+  musl-tools \
   net-tools \
   openssh-client \
   pkg-config \
@@ -44,7 +45,7 @@ ENV RUST_VERSION=1.92.0
 ENV RUSTUP_HOME=/opt/rustup
 ENV CARGO_HOME=/opt/cargo
 RUN curl --fail https://sh.rustup.rs -sSf \
-  | sh -s -- -y --default-toolchain=${RUST_VERSION} -t x86_64-unknown-linux-musl -t aarch64-unknown-linux-gnu
+  | sh -s -- -y --default-toolchain=${RUST_VERSION} -t x86_64-unknown-linux-musl -t aarch64-unknown-linux-musl
 ENV PATH=${CARGO_HOME}/bin:${PATH}
 
 # Add missing components for rust
