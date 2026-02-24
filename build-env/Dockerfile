@@ -18,6 +18,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
   git \
   imagemagick \
   jq \
+  less \
   libc6-dev-arm64-cross \
   libgtest-dev \
   libssl-dev \
@@ -29,6 +30,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
   net-tools \
   openssh-client \
   pkg-config \
+  podman \
   procps \
   python3 \
   python3-pip \
