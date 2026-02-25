@@ -11,6 +11,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
   clang-tools \
   cmake \
   curl \
+  docker-buildx \
   flake8 \
   gcc \
   gcc-aarch64-linux-gnu \
