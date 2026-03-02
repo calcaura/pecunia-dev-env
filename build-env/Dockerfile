@@ -46,6 +46,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
 ENV RUST_VERSION=1.93.1
 ENV RUSTUP_HOME=/opt/rustup
 ENV CARGO_HOME=/opt/cargo
+ENV CARGO_TARGET_DIR=/opt/cargo/target
 RUN curl --fail https://sh.rustup.rs -sSf \
   | sh -s -- -y --default-toolchain=${RUST_VERSION} \
   -t x86_64-unknown-linux-musl \
@@ -83,9 +84,17 @@ RUN useradd -m -s /bin/bash cylon &&\
   passwd -d cylon &&\
   echo "cylon ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/cylon
 
+# Final permission fix
+RUN sudo chmod -R 0777 /opt/
+RUN install -d -m 0775 -o cylon -g cylon /opt/cargo/target
+
+# Add the sample folder and prebuild it in order to warmup cargo
+ADD build-env/sample /tmp/sample
+RUN cd /tmp/sample && \
+  sudo -u cylon -H env RUSTUP_HOME=/opt/rustup CARGO_HOME=/opt/cargo CARGO_TARGET_DIR=/opt/cargo/target /opt/cargo/bin/cargo fetch --locked && \
+  sudo -u cylon -H env RUSTUP_HOME=/opt/rustup CARGO_HOME=/opt/cargo CARGO_TARGET_DIR=/opt/cargo/target /opt/cargo/bin/cargo build --release -p dep-precompiler
+RUN chown -R cylon:cylon /opt/cargo/target && chmod -R u+rwX,g+rwX /opt/cargo/target
+
 # Final cleanup
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/log/* /usr/share/local/*
 RUN userdel -fr ubuntu || true
-
-# Final permission fix
-RUN sudo chmod -R 0777 /opt/
