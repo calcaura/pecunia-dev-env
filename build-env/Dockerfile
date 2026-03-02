@@ -38,7 +38,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
   python3-pip \
   sudo \
   vim \
-  wget
+  wget \
+  zig
 
 
 # Install Rust
