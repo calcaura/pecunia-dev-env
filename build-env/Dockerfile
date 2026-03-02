@@ -43,11 +43,16 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  --no-install-rec
 
 
 # Install Rust
-ENV RUST_VERSION=1.92.0
+ENV RUST_VERSION=1.93.1
 ENV RUSTUP_HOME=/opt/rustup
 ENV CARGO_HOME=/opt/cargo
 RUN curl --fail https://sh.rustup.rs -sSf \
-  | sh -s -- -y --default-toolchain=${RUST_VERSION} -t x86_64-unknown-linux-musl -t aarch64-unknown-linux-musl
+  | sh -s -- -y --default-toolchain=${RUST_VERSION} \
+  -t x86_64-unknown-linux-musl \
+  -t x86_64-unknown-linux-gnu \
+  -t aarch64-unknown-linux-musl \
+  -t aarch64-unknown-linux-gnu
+
 ENV PATH=${CARGO_HOME}/bin:${PATH}
 
 # Add missing components for rust
